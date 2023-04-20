@@ -7,7 +7,7 @@ import { IoMdSettings, IoMdRefresh } from "react-icons/io";
 import { Button, FastBuyItem, TokenStatus, TradeInput } from "./components";
 
 // @import actions
-import { getTokenData } from "./actions";
+import { getTokenData, getTokenQuote } from "./actions";
 
 // @import types
 import { TokenDataProps } from "./types/actions";
@@ -28,9 +28,64 @@ import { fastBuyItems } from "./data";
 
 const App: React.FC = () => {
   const [tokenData, setTokenData] = useState<Array<TokenDataProps>>([]);
+  const [quoteData, setQuoteData] = useState<number>(0);
+  const [pageLoading, setPageLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedBuyToken, setSelectedBuyToken] = useState<TokenDataProps>();
   const [selectedSellToken, setSelectedSellToken] = useState<TokenDataProps>();
+  const [amount, setAmount] = useState(1);
+  const [tokenStatus, setTokenStatus] = useState<number>(0);
+
+  useEffect(() => {
+    const getData = async () => {
+      setPageLoading(true);
+      const data = await getTokenData();
+
+      setPageLoading(false);
+      setTokenData(data);
+    };
+    getData();
+  }, []);
+
+  useEffect(() => {
+    setSelectedBuyToken(tokenData.filter((f) => f.symbol === "ETH")[0]);
+    setSelectedSellToken(tokenData.filter((f) => f.symbol === "UMA")[0]);
+  }, [tokenData]);
+
+  useEffect(() => {
+    getTokenValue(amount);
+  }, [selectedBuyToken, selectedSellToken, amount]);
+
+  const getTokenValue = async (value: number) => {
+    setLoading(true);
+    const tokenQuote = await getTokenQuote({
+      fromAddress: selectedBuyToken?.address,
+      toAddress: selectedSellToken?.address,
+      amount: value * Math.pow(10, Number(selectedBuyToken?.decimals)),
+    });
+    const status = await getTokenQuote({
+      fromAddress: selectedBuyToken?.address,
+      toAddress: selectedSellToken?.address,
+      amount: 1 * Math.pow(10, Number(selectedBuyToken?.decimals)),
+    });
+    setLoading(false);
+    setTokenStatus(
+      Number(
+        (
+          Number(status?.toTokenAmount) / Math.pow(10, status?.toToken.decimals)
+        ).toFixed(5)
+      )
+    );
+
+    setQuoteData(
+      Number(
+        (
+          Number(tokenQuote?.toTokenAmount) /
+          Math.pow(10, tokenQuote?.toToken.decimals)
+        ).toFixed(5)
+      )
+    );
+  };
 
   const handleSelectToken = (token: TokenDataProps, type: string) => {
     if (type === "buy") {
@@ -46,17 +101,16 @@ const App: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const getData = async () => {
-      setLoading(true);
-      const data = await getTokenData();
-      setLoading(false);
-      setTokenData(data);
-      setSelectedBuyToken(tokenData.filter((f) => f.symbol === "ETH")[0]);
-      setSelectedSellToken(tokenData.filter((f) => f.symbol === "UMA")[0]);
-    };
-    getData();
-  }, []);
+  const handleSellChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    if (!isNaN(Number(e.target.value))) {
+      setAmount(Number(e.target.value));
+    }
+  };
+
+  const handleExchange = () => {
+    setSelectedBuyToken(selectedSellToken);
+    setSelectedSellToken(selectedBuyToken);
+  };
 
   const handleSwapClick = () => {};
 
@@ -64,8 +118,8 @@ const App: React.FC = () => {
 
   return (
     <PageContainer>
-      {loading ? (
-        "Loading..."
+      {pageLoading ? (
+        <img src="/images/loading.gif" alt="" />
       ) : (
         <TradingCardWrapper>
           <TradingCardContainer>
@@ -80,12 +134,16 @@ const App: React.FC = () => {
                     ? selectedBuyToken
                     : tokenData.filter((f) => f.symbol === "ETH")[0]
                 }
+                onMinClick={() => setAmount(1)}
+                type={"sell"}
                 isMin={true}
+                amount={amount}
                 tokenData={tokenData}
                 onSelectChange={(token) => handleSelectToken(token, "buy")}
+                onChange={handleSellChange}
               />
               <ExchangeButtonWrapper>
-                <span>
+                <span onClick={handleExchange}>
                   <RiArrowUpDownLine size={24} />
                 </span>
               </ExchangeButtonWrapper>
@@ -95,8 +153,12 @@ const App: React.FC = () => {
                     ? selectedSellToken
                     : tokenData.filter((f) => f.symbol === "UMA")[0]
                 }
+                type={"buy"}
                 tokenData={tokenData}
                 onSelectChange={(token) => handleSelectToken(token, "sell")}
+                quote={quoteData}
+                loading={loading}
+                onChange={() => {}}
               />
             </TradeInputGroup>
             <FastBuyGrid>
@@ -108,7 +170,12 @@ const App: React.FC = () => {
                 />
               ))}
             </FastBuyGrid>
-            <TokenStatus />
+            <TokenStatus
+              loading={loading}
+              sellToken={selectedSellToken}
+              buyToken={selectedBuyToken}
+              value={tokenStatus}
+            />
             <Button title="Swap" onClick={handleSwapClick} />
           </TradingCardContainer>
         </TradingCardWrapper>

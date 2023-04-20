@@ -10,20 +10,34 @@ import {
   TokenValueWrapper,
 } from "./styles";
 
-export const TokenStatus: React.FC = () => {
+// @import types
+import { TokenStatusProps } from "../../types/components";
+
+export const TokenStatus: React.FC<TokenStatusProps> = ({
+  sellToken,
+  buyToken,
+  loading,
+  value,
+}) => {
   return (
     <TokenStatusWrapper>
-      <TokenValueWrapper>
-        <AiFillInfoCircle color="#7185AA" size={14} />
-        <p>
-          1 ETH = 2031.21 ARB <span>($2030.4)</span>
-        </p>
-      </TokenValueWrapper>
-      <TokenUSDAmountWrapper>
-        <img src="/images/token.png" alt="" />
-        <p>$0</p>
-        <MdKeyboardArrowDown size={20} color="#7185AA" />
-      </TokenUSDAmountWrapper>
+      {loading ? (
+        <img src="/images/loading.gif" alt="" />
+      ) : (
+        <>
+          <TokenValueWrapper>
+            <AiFillInfoCircle color="#7185AA" size={14} />
+            <p>
+              1 {buyToken?.symbol} = {value} {sellToken?.symbol}{" "}
+            </p>
+          </TokenValueWrapper>
+          <TokenUSDAmountWrapper>
+            <img src="/images/token.png" alt="" />
+            <p>$0</p>
+            <MdKeyboardArrowDown size={20} color="#7185AA" />
+          </TokenUSDAmountWrapper>
+        </>
+      )}
     </TokenStatusWrapper>
   );
 };

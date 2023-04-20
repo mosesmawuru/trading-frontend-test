@@ -38,7 +38,7 @@ export const TokenSelectWrapper = styled.div`
 
 export const TokenListDropdown = styled.div<{ isShow: boolean }>`
   z-index: 3;
-  height: 300px;
+  max-height: 300px;
   overflow: auto;
   position: absolute;
   width: 100%;

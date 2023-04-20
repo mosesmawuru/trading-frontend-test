@@ -11,6 +11,9 @@ export const TokenStatusWrapper = styled.div`
   justify-content: space-between;
   margin-bottom: 22px;
   cursor: pointer;
+  & > img {
+    height: 30px;
+  }
 `;
 
 export const TokenValueWrapper = styled.div`

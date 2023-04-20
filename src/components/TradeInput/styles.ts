@@ -40,6 +40,9 @@ export const InputActionWrapper = styled.div`
     line-height: 42px;
     color: #ffffff;
   }
+  & > img {
+    height: 30px;
+  }
 `;
 
 export const TokenSelectWrapper = styled.div`

@@ -20,23 +20,32 @@ export const TradeInput: React.FC<TradeInputProps> = ({
   tokenData,
   selected,
   isMin,
+  quote,
+  type,
+  loading,
   onSelectChange,
+  onChange,
+  onMinClick,
+  amount,
 }) => {
-  const [amount, setAmount] = useState(1);
-  const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    if (!isNaN(Number(e.target.value))) setAmount(Number(e.target.value));
-  };
-
   return (
     <TradeInputWrapper>
       <InputLabelWrapper>
         <span>~$10 921.69</span>
-        <span>You buy</span>
+        <span>You {type}</span>
       </InputLabelWrapper>
       <InputActionWrapper>
-        <input value={amount} type="text" onChange={handleInputChange} />
+        {loading ? (
+          <img src="/images/loading.gif" alt="" />
+        ) : (
+          <input
+            value={quote ? quote : amount}
+            type="text"
+            onChange={onChange}
+          />
+        )}
         <TokenSelectWrapper>
-          {isMin && <MinButton onClick={() => setAmount(1)}>Min</MinButton>}
+          {isMin && <MinButton onClick={onMinClick}>Min</MinButton>}
           <TokenSelect
             tokenData={tokenData}
             selected={selected}
