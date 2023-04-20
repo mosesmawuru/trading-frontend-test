@@ -38,6 +38,8 @@ export const TokenSelectWrapper = styled.div`
 
 export const TokenListDropdown = styled.div<{ isShow: boolean }>`
   z-index: 3;
+  height: 300px;
+  overflow: auto;
   position: absolute;
   width: 100%;
   background: #141822;
@@ -60,6 +62,17 @@ export const TokenListDropdown = styled.div<{ isShow: boolean }>`
     width: 90%;
     margin: auto;
     margin-bottom: 4px;
+  }
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-track {
+    border-radius: 30px;
+    background-color: darkgrey;
+  }
+  &::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 30px;
   }
 `;
 

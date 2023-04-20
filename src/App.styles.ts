@@ -85,3 +85,18 @@ export const ExchangeButtonWrapper = styled.div`
     background: #101010;
   }
 `;
+
+export const TradeToolBarWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  color: #ffffff;
+  font-size: 20px;
+  & > :not(:first-child) {
+    margin-left: 18px;
+  }
+  margin-bottom: 23px;
+  svg {
+    cursor: pointer;
+  }
+`;

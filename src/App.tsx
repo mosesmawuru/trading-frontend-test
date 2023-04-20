@@ -1,9 +1,10 @@
 // @import npm modules
 import React, { useEffect, useState } from "react";
 import { RiArrowUpDownLine } from "react-icons/ri";
+import { IoMdSettings, IoMdRefresh } from "react-icons/io";
 
 // @import custom components
-import { Button, FastBuyItem, TradeInput } from "./components";
+import { Button, FastBuyItem, TokenStatus, TradeInput } from "./components";
 
 // @import actions
 import { getTokenData } from "./actions";
@@ -17,6 +18,7 @@ import {
   FastBuyGrid,
   PageContainer,
   TradeInputGroup,
+  TradeToolBarWrapper,
   TradingCardContainer,
   TradingCardWrapper,
 } from "./App.styles";
@@ -65,9 +67,12 @@ const App: React.FC = () => {
       {loading ? (
         "Loading..."
       ) : (
-        // "loading..."
         <TradingCardWrapper>
           <TradingCardContainer>
+            <TradeToolBarWrapper>
+              <IoMdRefresh size={22} />
+              <IoMdSettings size={20} />
+            </TradeToolBarWrapper>
             <TradeInputGroup>
               <TradeInput
                 selected={
@@ -103,6 +108,7 @@ const App: React.FC = () => {
                 />
               ))}
             </FastBuyGrid>
+            <TokenStatus />
             <Button title="Swap" onClick={handleSwapClick} />
           </TradingCardContainer>
         </TradingCardWrapper>
