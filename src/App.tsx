@@ -1,26 +1,114 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// @import npm modules
+import React, { useEffect, useState } from "react";
+import { RiArrowUpDownLine } from "react-icons/ri";
 
-function App() {
+// @import custom components
+import { Button, FastBuyItem, TradeInput } from "./components";
+
+// @import actions
+import { getTokenData } from "./actions";
+
+// @import types
+import { TokenDataProps } from "./types/actions";
+
+// @import styled components
+import {
+  ExchangeButtonWrapper,
+  FastBuyGrid,
+  PageContainer,
+  TradeInputGroup,
+  TradingCardContainer,
+  TradingCardWrapper,
+} from "./App.styles";
+
+// @import page data
+import { fastBuyItems } from "./data";
+
+const App: React.FC = () => {
+  const [tokenData, setTokenData] = useState<Array<TokenDataProps>>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedBuyToken, setSelectedBuyToken] = useState<TokenDataProps>();
+  const [selectedSellToken, setSelectedSellToken] = useState<TokenDataProps>();
+
+  const handleSelectToken = (token: TokenDataProps, type: string) => {
+    if (type === "buy") {
+      if (token.address === selectedSellToken?.address) {
+        setSelectedSellToken(selectedBuyToken);
+      }
+      setSelectedBuyToken(token);
+    } else {
+      if (token.address === selectedBuyToken?.address) {
+        setSelectedBuyToken(selectedSellToken);
+      }
+      setSelectedSellToken(token);
+    }
+  };
+
+  useEffect(() => {
+    const getData = async () => {
+      setLoading(true);
+      const data = await getTokenData();
+      setLoading(false);
+      setTokenData(data);
+      setSelectedBuyToken(tokenData.filter((f) => f.symbol === "ETH")[0]);
+      setSelectedSellToken(tokenData.filter((f) => f.symbol === "UMA")[0]);
+    };
+    getData();
+  }, []);
+
+  const handleSwapClick = () => {};
+
+  const handleFastBuyClick = (per: number) => {};
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <PageContainer>
+      {loading ? (
+        "Loading..."
+      ) : (
+        // "loading..."
+        <TradingCardWrapper>
+          <TradingCardContainer>
+            <TradeInputGroup>
+              <TradeInput
+                selected={
+                  selectedBuyToken
+                    ? selectedBuyToken
+                    : tokenData.filter((f) => f.symbol === "ETH")[0]
+                }
+                isMin={true}
+                tokenData={tokenData}
+                onSelectChange={(token) => handleSelectToken(token, "buy")}
+              />
+              <ExchangeButtonWrapper>
+                <span>
+                  <RiArrowUpDownLine size={24} />
+                </span>
+              </ExchangeButtonWrapper>
+              <TradeInput
+                selected={
+                  selectedSellToken
+                    ? selectedSellToken
+                    : tokenData.filter((f) => f.symbol === "UMA")[0]
+                }
+                tokenData={tokenData}
+                onSelectChange={(token) => handleSelectToken(token, "sell")}
+              />
+            </TradeInputGroup>
+            <FastBuyGrid>
+              {fastBuyItems.map((item, key) => (
+                <FastBuyItem
+                  label={item}
+                  key={key}
+                  onClick={() => handleFastBuyClick(item)}
+                />
+              ))}
+            </FastBuyGrid>
+            <Button title="Swap" onClick={handleSwapClick} />
+          </TradingCardContainer>
+        </TradingCardWrapper>
+      )}
+    </PageContainer>
   );
-}
+};
 
 export default App;

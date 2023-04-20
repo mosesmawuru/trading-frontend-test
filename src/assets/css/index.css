@@ -1,0 +1,22 @@
+@font-face {
+  font-family: Circular Std;
+  src: url("../font/circular-std-medium-500.ttf");
+}
+
+body {
+  margin: 0;
+  font-family: "Circular Std";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #1e1e1e;
+  color: #fff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
