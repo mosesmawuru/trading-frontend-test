@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { RiArrowUpDownLine } from "react-icons/ri";
 import { IoMdSettings, IoMdRefresh } from "react-icons/io";
+import toast, { Toaster } from "react-hot-toast";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 // @import custom components
 import { Button, FastBuyItem, TokenStatus, TradeInput } from "./components";
@@ -26,9 +29,6 @@ import {
 // @import page data
 import { fastBuyItems } from "./data";
 
-import { InjectedConnector } from "wagmi/connectors/injected";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
-
 // Pass client to React Context Provider
 
 const App: React.FC = () => {
@@ -48,13 +48,6 @@ const App: React.FC = () => {
   const { disconnect } = useDisconnect();
 
   useEffect(() => {
-    const getData = async () => {
-      setPageLoading(true);
-      const data = await getTokenData();
-
-      setPageLoading(false);
-      setTokenData(data);
-    };
     getData();
   }, []);
 
@@ -67,6 +60,26 @@ const App: React.FC = () => {
     getTokenValue(amount);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBuyToken, selectedSellToken, amount]);
+
+  useEffect(() => {
+    isConnected &&
+      toast.success("Metamask wallet is Connected!", {
+        icon: "👏",
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+  }, [isConnected]);
+
+  const getData = async () => {
+    setPageLoading(true);
+    const data = await getTokenData();
+
+    setPageLoading(false);
+    setTokenData(data);
+  };
 
   const getTokenValue = async (value: number) => {
     setLoading(true);
@@ -124,21 +137,26 @@ const App: React.FC = () => {
     setSelectedSellToken(selectedBuyToken);
   };
 
-  const handleSwapClick = () => {
+  const handleSwapClick = async () => {
     isConnected ? disconnect() : connect();
+  };
+
+  const handleRefresh = () => {
+    getTokenValue(amount);
   };
 
   const handleFastBuyClick = (per: number) => {};
 
   return (
     <PageContainer>
+      <Toaster position="top-center" reverseOrder={false} />
       {pageLoading ? (
         <img src="/images/loading.gif" alt="" />
       ) : (
         <TradingCardWrapper>
           <TradingCardContainer>
             <TradeToolBarWrapper>
-              <IoMdRefresh size={22} />
+              <IoMdRefresh size={22} onClick={handleRefresh} />
               <IoMdSettings size={20} />
             </TradeToolBarWrapper>
             <TradeInputGroup>
