@@ -26,6 +26,11 @@ import {
 // @import page data
 import { fastBuyItems } from "./data";
 
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
+
+// Pass client to React Context Provider
+
 const App: React.FC = () => {
   const [tokenData, setTokenData] = useState<Array<TokenDataProps>>([]);
   const [quoteData, setQuoteData] = useState<number>(0);
@@ -35,6 +40,12 @@ const App: React.FC = () => {
   const [selectedSellToken, setSelectedSellToken] = useState<TokenDataProps>();
   const [amount, setAmount] = useState(1);
   const [tokenStatus, setTokenStatus] = useState<number>(0);
+
+  const { isConnected } = useAccount();
+  const { connect } = useConnect({
+    connector: new InjectedConnector(),
+  });
+  const { disconnect } = useDisconnect();
 
   useEffect(() => {
     const getData = async () => {
@@ -54,6 +65,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     getTokenValue(amount);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBuyToken, selectedSellToken, amount]);
 
   const getTokenValue = async (value: number) => {
@@ -112,7 +124,9 @@ const App: React.FC = () => {
     setSelectedSellToken(selectedBuyToken);
   };
 
-  const handleSwapClick = () => {};
+  const handleSwapClick = () => {
+    isConnected ? disconnect() : connect();
+  };
 
   const handleFastBuyClick = (per: number) => {};
 
@@ -176,7 +190,10 @@ const App: React.FC = () => {
               buyToken={selectedBuyToken}
               value={tokenStatus}
             />
-            <Button title="Swap" onClick={handleSwapClick} />
+            <Button
+              title={isConnected ? "Disconnect" : "Connect"}
+              onClick={handleSwapClick}
+            />
           </TradingCardContainer>
         </TradingCardWrapper>
       )}

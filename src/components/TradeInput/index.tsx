@@ -1,5 +1,5 @@
 // @import npm modules
-import React, { useState } from "react";
+import React from "react";
 
 // @import custom components
 import { TokenSelect } from "../TokenSelect";
